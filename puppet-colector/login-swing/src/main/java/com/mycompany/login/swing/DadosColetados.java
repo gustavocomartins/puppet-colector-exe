@@ -69,13 +69,11 @@ public class DadosColetados {
         Sistema teste = new Sistema();
         DadosColetados dados = new DadosColetados();
         ServicosGroup servicosGroup = new ServicosGroup();
-
+        System.out.println("Estou aqui id: " + mv.getId());
         while (true) {
 
             try {
                 for (int i = 1; i > 0; i++) {
-                    
-                    setFkMaquinaVirtual(mv.getId());
                     
                     // Importando Date e SimpleDateFormat para formatar a hora
                     Date dataAtual = new Date();

@@ -121,6 +121,7 @@ public class MaquinaVirtual {
                 ram,
                 processador,
                 id);
+        dados.insercaoDados();
 
     }
 

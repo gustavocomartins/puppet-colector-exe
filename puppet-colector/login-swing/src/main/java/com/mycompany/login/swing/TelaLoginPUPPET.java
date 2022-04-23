@@ -192,7 +192,7 @@ public class TelaLoginPUPPET extends javax.swing.JFrame {
                 mv.updateMaquina();
                 System.out.println(mv);
                 mv.updateTabela();
-                dados.insercaoDados();
+                
             }
             else{
                 labelTesteLogin.setText("senha incorreta.");
