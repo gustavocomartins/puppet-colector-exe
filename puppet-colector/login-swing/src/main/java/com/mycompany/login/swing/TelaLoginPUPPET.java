@@ -162,21 +162,37 @@ public class TelaLoginPUPPET extends javax.swing.JFrame {
     }//GEN-LAST:event_passwordFieldActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        MaquinaVirtual mv = new MaquinaVirtual();
+        DadosColetados dados = new DadosColetados();
+        
         String username = textFieldEmail.getText();
         String senha = String.valueOf(passwordField.getPassword());
         System.out.println(username + ' ' + senha); 
         
-        String queryUser = String.format("select id, username, senha from usuario where username = '%s';", username);
+        String queryUser = String.format(""
+                + "select id, fkAdmin, hostName, userLogin, senha, ip, disco, ram, processador from maquinaVirtual where userLogin = '%s';", username);
         System.out.println(queryUser);       
-        List<Usuario> user = template.query(queryUser, new BeanPropertyRowMapper<>(Usuario.class));               
+        List<MaquinaVirtual> user = template.query(queryUser, new BeanPropertyRowMapper<>(MaquinaVirtual.class));               
         System.out.println(user);
         
         if(user.isEmpty()){  
             labelTesteLogin.setText("Usuário não encontrado.");
         }
-        else if (user.get(0).username.equals(username)){
-            if(user.get(0).senha.equals(senha)){
-                labelTesteLogin.setText("email e senha corretos");
+        else if (user.get(0).getUserLogin().equals(username)){
+            if(user.get(0).getSenha().equals(senha)){
+                labelTesteLogin.setText("email e senha corretos" + user.get(0).getFkAdmin());
+                dados.setIsLogado(true);
+                mv.setId(user.get(0).getId());
+                mv.setFkAdmin(user.get(0).getFkAdmin());;
+                mv.setId(user.get(0).getId());
+                mv.setUserLogin(user.get(0).getUserLogin());
+                mv.setSenha(user.get(0).getSenha());
+                
+                System.out.println(mv);
+                mv.updateMaquina();
+                System.out.println(mv);
+                mv.updateTabela();
+                dados.insercaoDados();
             }
             else{
                 labelTesteLogin.setText("senha incorreta.");
