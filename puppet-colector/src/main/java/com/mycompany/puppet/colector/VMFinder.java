@@ -4,17 +4,22 @@
  */
 package com.mycompany.puppet.colector;
 
+import java.util.List;
+
 /**
  *
  * @author gusta
  */
 public class VMFinder extends javax.swing.JFrame {
-
+    private Usuario usuarioLogado;
     /**
      * Creates new form VMFinder
      */
-    public VMFinder() {
+    public VMFinder(Usuario usuario) {
+        usuarioLogado = usuario;
         initComponents();
+    }
+    public VMFinder() {
     }
 
     /**
@@ -30,6 +35,7 @@ public class VMFinder extends javax.swing.JFrame {
         lblTitulo = new javax.swing.JLabel();
         keyField = new javax.swing.JTextField();
         btnIdentificar = new javax.swing.JButton();
+        lblStatus = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,7 +74,11 @@ public class VMFinder extends javax.swing.JFrame {
                         .addComponent(keyField, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(96, 96, 96)
-                        .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(52, 52, 52)
+                                .addComponent(lblStatus)))))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -78,7 +88,9 @@ public class VMFinder extends javax.swing.JFrame {
                 .addComponent(lblTitulo)
                 .addGap(47, 47, 47)
                 .addComponent(keyField, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                .addGap(26, 26, 26)
+                .addComponent(lblStatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
                 .addComponent(btnIdentificar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(67, 67, 67))
         );
@@ -98,7 +110,32 @@ public class VMFinder extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIdentificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIdentificarActionPerformed
-        // TODO add your handling code here:
+        Util util = new Util();
+        String keyVm = keyField.getText();
+        util.registerKeyVMLocal(keyVm);
+        System.out.println("Chave registrada localmente com sucesso.");
+        List<MaquinaVirtual> vmList = util.searchVmByKey();
+        if(vmList.isEmpty() == false){
+            if(util.isVmComplete(vmList.get(0))){
+                lblStatus.setText("Máquina Localizada!");
+                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado);
+                this.dispose();
+                telaUser.setVisible(true);
+            }
+            else{
+                util.updateObjectVm(vmList.get(0));
+                util.updateVmRegistrationOnAzure(vmList.get(0));
+                System.out.println("Atualizando o resgitro no sistema Puppet");
+                System.out.println(vmList.get(0));
+                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado);
+                this.dispose();
+                telaUser.setVisible(true);
+            }
+        }
+        else{
+            lblStatus.setText("A Máquina não foi localizada.");
+        }
+        
     }//GEN-LAST:event_btnIdentificarActionPerformed
 
     private void keyFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyFieldActionPerformed
@@ -144,6 +181,7 @@ public class VMFinder extends javax.swing.JFrame {
     private javax.swing.JButton btnIdentificar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField keyField;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JLabel lblTitulo;
     // End of variables declaration//GEN-END:variables
 }

@@ -184,47 +184,52 @@ public class TelaLogin extends javax.swing.JFrame {
         
         if(isLoginValido == true){
             if(util.isVmConfigured()){
-                List<String> keyVmList = util.getVmKey();
-                if(keyVmList.isEmpty() == false){
-                    if(util.isKeyLocalRegistered()){
-                        List<MaquinaVirtual> vmAzureList = util.searchVmByKey();
-                        if(vmAzureList != null){
+                if(util.isKeyLocalRegistered()){
+                    String key = util.getVmKey();
+                    System.out.println("A chave é: " + key);
+                    if(key != "Não encontrada localmente"){
+                       List<MaquinaVirtual> vmAzureList = util.searchVmByKey();
+                        if(vmAzureList.isEmpty() == false){
                             if(util.isVmComplete(vmAzureList.get(0))){
                                 TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0));
                                 this.dispose();
                                 telaUsuario.setVisible(true);
                             }
                             else{
-                                VMFinder telaVmFinder = new VMFinder();
+                                System.out.println("Completando o registro da máquina em nosso sistema...");
+                                
+                                TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0));
                                 this.dispose();
-                                telaVmFinder.setVisible(true);
-                            }
+                                telaUsuario.setVisible(true);
+                            } 
                         }
                         else{
-                            VMFinder telaVmFinder = new VMFinder();
-                            this.dispose();
-                            telaVmFinder.setVisible(true);
+                        VMFinder telaVmFinder = new VMFinder(user.get(0));
+                        this.dispose();
+                        telaVmFinder.setVisible(true);
                         }
                     }
                     else{
-                        VMFinder telaVmFinder = new VMFinder();
-                        this.dispose();
-                        telaVmFinder.setVisible(true);
-                    }
+                    VMFinder telaVmFinder = new VMFinder(user.get(0));
+                    this.dispose();
+                    telaVmFinder.setVisible(true);
+                    }        
                 }
                 else{
-                    VMFinder telaVmFinder = new VMFinder();
+                    System.out.println("Chave ainda não foi registrada localmente.");
+                    VMFinder telaVmFinder = new VMFinder(user.get(0));
                     this.dispose();
                     telaVmFinder.setVisible(true);
                 }
             }
             else{
-                VMFinder telaVmFinder = new VMFinder();
+                util.setUpVm();
+                System.out.println("Sua máquina não foi configurada ainda.");
+                VMFinder telaVmFinder = new VMFinder(user.get(0));
                 this.dispose();
                 telaVmFinder.setVisible(true);
             }
-        }
-
+        }       
     }//GEN-LAST:event_btnLoginActionPerformed
 
     /**

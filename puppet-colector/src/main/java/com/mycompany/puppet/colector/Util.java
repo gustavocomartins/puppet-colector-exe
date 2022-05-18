@@ -58,22 +58,15 @@ public class Util {
         Boolean dirCollector  = isCollectorDirExists();
         Boolean dirLog        = isLogDirExists();
         Boolean fileKey       = isKeyFileExists();
-        Boolean keyRegistered = isKeyLocalRegistered();
         
-        return dirCollector && dirLog && fileKey && keyRegistered;
+        return dirCollector && dirLog && fileKey;
     }
     
     // Realiza a configuração local necessária.
     public void setUpVm(){
-        if(isCollectorDirExists() == false){
-            createCollectorDir();
-        }
-        if(isLogDirExists() == false){
-            createLogDir();
-        }
-        if(isKeyFileExists()){
-            createKeyFile();
-        }
+        createCollectorDir();
+        createLogDir();
+        createKeyFile();
     }
     
     // ---------------------------------------------------------------------------------------
@@ -102,7 +95,7 @@ public class Util {
     // ---------------------------------------------------------------------------------------
     
     public Boolean isLogDirExists(){
-        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet + "collectorLogs");              
+        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + "collectorLogs");              
         return puppetDir.exists();
     }
     
@@ -122,7 +115,7 @@ public class Util {
     
     // Verificar se o arquivo existe.
     public Boolean isKeyFileExists(){
-        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + filePuppetKey;
+        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
         File puppetKey = new File(pathPuppetKey); 
         return puppetKey.exists();
     }
@@ -135,7 +128,7 @@ public class Util {
             Files.createFile(path);  
         }       
         catch (IOException e) {
-            System.out.println("Erro ao criar arquivo puppetKey.txt");
+            System.out.println("Erro ao criar arquivo " + path.toString());
         }
     }
     
@@ -163,7 +156,7 @@ public class Util {
     
     // Registrar chave no arquivo puppetKey.txt.
     public void registerKeyVMLocal(String keyVM){
-        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + filePuppetKey;
+        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
         File puppetKey = new File(pathPuppetKey); 
         
         try(PrintWriter writer = new PrintWriter(new FileOutputStream(puppetKey))) {
@@ -178,22 +171,24 @@ public class Util {
     }   
         
     // Buscar a chave no arquivo puppetKey.txt.
-    public List<String> getVmKey(){
+    public String getVmKey(){
         String pathKeyFile = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
-        List<String> keyVm = new ArrayList<>();
+        List<String> keyVmList = new ArrayList<>();
+        String key = "Não encontrada localmente";
         
         try(BufferedReader bfrReader = new BufferedReader(new FileReader(pathKeyFile))){
             String keyRead = bfrReader.readLine();
             if(keyRead != null){
-                System.out.println("keyVM: " + keyVm);
-                keyVm.add(keyRead);
+                keyVmList.add(keyRead);
+                System.out.println("keyVM: " + keyVmList.get(0));              
+                key = keyVmList.get(0);
             }
         }
         catch(IOException e){
             System.out.println("Error: " + e.getMessage());
         }
         
-        return keyVm;
+        return key;
     }
     
     // ---------------------------------------------------------------------------------------
@@ -203,10 +198,11 @@ public class Util {
     // Buscar no banco a máquina através da chave registrada localmente.
     public List<MaquinaVirtual> searchVmByKey(){
        
-        List<String> keyVm = getVmKey(); 
+        String key = getVmKey(); 
+        
         List<MaquinaVirtual>vmList;        
        
-        String query = String.format("select * from [dbo].[maquinaVirtual] where keyVm = '%s';", keyVm);
+        String query = String.format("select * from [dbo].[maquinaVirtual] where keyVm = '%s';", key);
         System.out.println(query);
         vmList = template.query(query, new BeanPropertyRowMapper<>(MaquinaVirtual.class));
         
@@ -260,9 +256,9 @@ public class Util {
         vm.setDisco(discoTotal);
         vm.setProcessador(processadorNome);
         
-        List<String> keyVmList = getVmKey();       
-        if(!keyVmList.isEmpty()){
-            vm.setKeyVm(keyVmList.get(0));
+        String key = getVmKey();       
+        if(key != null){
+            vm.setKeyVm(key);
         }
         
         try {
