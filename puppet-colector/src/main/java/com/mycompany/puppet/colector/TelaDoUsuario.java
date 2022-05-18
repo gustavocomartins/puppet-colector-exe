@@ -187,7 +187,7 @@ public class TelaDoUsuario extends javax.swing.JFrame {
                 mv.setId(vmLista.get(0).getId());
                 mv.setFkAdmin(vmLista.get(0).getFkAdmin());
                 mv.setId(vmLista.get(0).getId());
-                mv.setUserLogin(vmLista.get(0).getUserLogin());
+                mv.setNome(vmLista.get(0).getNome());
                 mv.setKeyVm(vmLista.get(0).getKeyVM());   
                 
                 System.out.println(mv);

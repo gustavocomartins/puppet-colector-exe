@@ -17,7 +17,7 @@ public class MaquinaVirtual {
     private Integer id;
     private Integer fkAdmin;
     private String  hostName;
-    private String  userLogin;
+    private String  nome;
     private String  ip;
     private Integer disco;
     private Integer ram;
@@ -34,7 +34,7 @@ public class MaquinaVirtual {
                 + "ID: %d\n"
                 + "fkAdmin: %d\n"
                 + "Host name: %s\n"
-                + "User login: %s\n"
+                + "Nome: %s\n"
                 + "IP: %s\n"
                 + "Armazenamento: %d\n"
                 + "Memória ram: %d\n"
@@ -42,7 +42,7 @@ public class MaquinaVirtual {
                 + "keyVM: %s\n",
                 id, fkAdmin,
                 hostName,
-                userLogin,
+                nome,
                 ip,
                 disco,
                 ram,
@@ -149,12 +149,12 @@ public class MaquinaVirtual {
         this.hostName = hostName;
     }
 
-    public String getUserLogin() {
-        return userLogin;
+    public String getNome() {
+        return nome;
     }
 
-    public void setUserLogin(String userLogin) {
-        this.userLogin = userLogin;
+    public void setNome(String userLogin) {
+        this.nome = userLogin;
     }
 
     public String getIp() {

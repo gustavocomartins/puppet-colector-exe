@@ -4,7 +4,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 public class Connection {
 
-    private BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
 
     public Connection() {
         dataSource = new BasicDataSource();

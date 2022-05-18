@@ -226,8 +226,8 @@ public class Util {
         updateObjectVm(vm);
         
         String query = "UPDATE maquinaVirtual SET " +
-                       "hostName= ?, userLogin= ?, ip=?, disco=?, ram=?, processador= ?, keyVM= ? " +
-                       "WHERE keyVm = ? and fkAdmin = ?";
+                       "hostName= ?, ip=?, disco=?, ram=?, processador= ? " +
+                       "WHERE keyVm = ?";
         
         template.update(query,
                 vm.getHostName(),
@@ -235,8 +235,7 @@ public class Util {
                 vm.getDisco(),
                 vm.getRam(),
                 vm.getProcessador(),
-                vm.getKeyVM(),
-                vm.getFkAdmin());            
+                vm.getKeyVM());          
     }
     
     // Atualiza o objeto VM instanciado ao buscar na Azure através da chave.

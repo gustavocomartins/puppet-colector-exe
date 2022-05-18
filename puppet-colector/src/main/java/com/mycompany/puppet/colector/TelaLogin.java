@@ -187,7 +187,7 @@ public class TelaLogin extends javax.swing.JFrame {
                 if(util.isKeyLocalRegistered()){
                     String key = util.getVmKey();
                     System.out.println("A chave é: " + key);
-                    if(key != "Não encontrada localmente"){
+                    if(key.equals("Não encontrada localmente")== false){
                        List<MaquinaVirtual> vmAzureList = util.searchVmByKey();
                         if(vmAzureList.isEmpty() == false){
                             if(util.isVmComplete(vmAzureList.get(0))){
@@ -197,16 +197,17 @@ public class TelaLogin extends javax.swing.JFrame {
                             }
                             else{
                                 System.out.println("Completando o registro da máquina em nosso sistema...");
-                                
+                                util.updateVmRegistrationOnAzure(vmAzureList.get(0));
                                 TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0));
                                 this.dispose();
                                 telaUsuario.setVisible(true);
                             } 
                         }
                         else{
-                        VMFinder telaVmFinder = new VMFinder(user.get(0));
-                        this.dispose();
-                        telaVmFinder.setVisible(true);
+                            System.out.println("Sua maquina nao foi encontrada, registre novamente a chave.");
+                            VMFinder telaVmFinder = new VMFinder(user.get(0));
+                            this.dispose();
+                            telaVmFinder.setVisible(true);
                         }
                     }
                     else{

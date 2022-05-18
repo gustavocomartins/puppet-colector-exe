@@ -8,11 +8,10 @@ com/mycompany/puppet/colector/TelaLogin$1.class
 com/mycompany/puppet/colector/Usuario.class
 com/mycompany/puppet/colector/TelaLogin$2.class
 com/mycompany/puppet/colector/TelaDoUsuario$1.class
-com/mycompany/puppet/colector/Connection.class
 com/mycompany/puppet/colector/VMFinder$3.class
+com/mycompany/puppet/colector/Connection.class
 com/mycompany/puppet/colector/MaquinaVirtual.class
 com/mycompany/puppet/colector/TelaLogin.class
 com/mycompany/puppet/colector/VMFinder$2.class
 com/mycompany/puppet/colector/TelaLogin$3.class
-.netbeans_automatic_build
 com/mycompany/puppet/colector/TelaDoUsuario.class
