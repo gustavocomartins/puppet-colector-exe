@@ -4,26 +4,23 @@
  */
 package com.mycompany.puppet.colector;
 
-import java.util.List;
-import java.util.Objects;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-/**
- *
- * @author gusta
- */
 public class TelaDoUsuario extends javax.swing.JFrame {
     private Usuario usuarioLogado;
+    private MaquinaVirtual vm;
+    private Util util = new Util();   
     Connection config = new Connection();        
     JdbcTemplate template = new JdbcTemplate(config.getDataSource()); 
-    DadosColetados dados = new DadosColetados();
     
     /**
      * Creates new form TelaDoUsuario
+     * @param usuario
+     * @param vm
      */
-    public TelaDoUsuario(Usuario usuario) {
-        Usuario usuarioLogado = usuario;
+    public TelaDoUsuario(Usuario usuario, MaquinaVirtual vm) {
+        this.usuarioLogado = usuario;
+        this.vm = vm;
         initComponents();
         
     }
@@ -166,35 +163,24 @@ public class TelaDoUsuario extends javax.swing.JFrame {
 
     private void btnPararColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPararColetaActionPerformed
         // TODO add your handling code here:   
-        dados.setIsColetaAtiva(false);
+        util.setIsColetaAtiva(false);
         
     }//GEN-LAST:event_btnPararColetaActionPerformed
 
     private void btnIniciarColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarColetaActionPerformed
-        // TODO add your handling code here:
-        String queryVM = String.format
-        ("select id, fkAdmin, hostName, userLogin, keyVM, ip, disco, ram, processador from maquinaVirtual where fkAdmin = %d;", this.usuarioLogado.id);
-        List<MaquinaVirtual> vmLista = template.query(queryVM, new BeanPropertyRowMapper<>(MaquinaVirtual.class));
-        
-        if(vmLista.isEmpty()){  
-            lblStatusAtualizacao.setText("Máquina virtual não encontrada.");
-        }
-        else if (Objects.equals(vmLista.get(0).getFkAdmin(), this.usuarioLogado.id)){
-                MaquinaVirtual mv = new MaquinaVirtual();             
-                lblStatusAtualizacao.setText("Configurações de máquina atualizadas");
-                lblStatusColeta.setText("Ativada.");
-                dados.setIsColetaAtiva(true);
-                mv.setId(vmLista.get(0).getId());
-                mv.setFkAdmin(vmLista.get(0).getFkAdmin());
-                mv.setId(vmLista.get(0).getId());
-                mv.setNome(vmLista.get(0).getNome());
-                mv.setKeyVm(vmLista.get(0).getKeyVM());   
-                
-                System.out.println(mv);
-                mv.updateMaquina(); 
-                System.out.println(mv);
-                mv.updateTabela();
-        } 
+                          
+        lblStatusAtualizacao.setText("Configurações de máquina atualizadas");
+        lblStatusColeta.setText("Ativada.");
+        util.setIsColetaAtiva(true);  
+        while(util.getIsColetaAtiva()){
+            try {
+                DadosColetados dados = util.coletarDados(vm);
+                util.inserirDados(dados);
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                ex.getMessage();
+            }
+        }       
     }//GEN-LAST:event_btnIniciarColetaActionPerformed
 
     /**

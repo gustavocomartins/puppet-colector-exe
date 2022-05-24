@@ -191,14 +191,14 @@ public class TelaLogin extends javax.swing.JFrame {
                        List<MaquinaVirtual> vmAzureList = util.searchVmByKey();
                         if(vmAzureList.isEmpty() == false){
                             if(util.isVmComplete(vmAzureList.get(0))){
-                                TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0));
+                                TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0), vmAzureList.get(0));
                                 this.dispose();
                                 telaUsuario.setVisible(true);
                             }
                             else{
                                 System.out.println("Completando o registro da máquina em nosso sistema...");
                                 util.updateVmRegistrationOnAzure(vmAzureList.get(0));
-                                TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0));
+                                TelaDoUsuario telaUsuario = new TelaDoUsuario(user.get(0), vmAzureList.get(0));
                                 this.dispose();
                                 telaUsuario.setVisible(true);
                             } 

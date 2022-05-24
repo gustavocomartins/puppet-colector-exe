@@ -1,12 +1,7 @@
 package com.mycompany.puppet.colector;
 //import com.github.britooo.looca.api.group.sistema.Sistema;
 //import com.github.britooo.looca.api.core.Looca;
-import com.github.britooo.looca.api.group.discos.DiscosGroup;
-import com.github.britooo.looca.api.group.memoria.Memoria;
-import com.github.britooo.looca.api.group.processador.Processador;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import org.springframework.jdbc.core.JdbcTemplate;
+
 
 /**
  *
@@ -49,81 +44,7 @@ public class MaquinaVirtual {
                 processador, 
                 keyVM);
     }
-
-    Connection config = new Connection();
-    JdbcTemplate template = new JdbcTemplate(config.getDataSource());
-
-    // public void main3(String[] args) {
-    //     MaquinaVirtual mv = new MaquinaVirtual();
-    //     mv.updateVmRegistration();
-    //     System.out.println(mv);
-    // }
-
-    public void updateMaquina() {
-        //Looca looca = new Looca();
-        //Sistema sistema = new Sistema();
-        
-        Processador processadorVm   = new Processador();
-        DiscosGroup grupoDeDiscosVm = new DiscosGroup();
-        Memoria     memoriaVm       = new Memoria();
-
-        // Memória Ram e Disco total convertida para Byte.
-        Integer ramTotal = (int) (memoriaVm.getTotal() / 1024);
-        Integer discoTotal = (int) (grupoDeDiscosVm.getTamanhoTotal() / 1024);
-
-        // Formatando nome do processador.
-        String processadorNome = String.format("%s %s %d",
-                processadorVm.getFabricante(),
-                processadorVm.getNome(),
-                processadorVm.getNumeroCpusLogicas()
-        );
-
-        // Setando os dados dentro das variaveis da classe MaquinaVirtual
-        setProcessador(processadorNome);
-        setRam(ramTotal);
-        setDisco(discoTotal);
-
-        // Para capturar o IP e HostName, precisei passar a condição try e catch
-        try {
-            // Importando o InetAddress
-            InetAddress iAddress;
-            iAddress = InetAddress.getLocalHost();
-
-            // Capturando dado do HostName e do endereço IP
-            String hostname = iAddress.getHostName();
-            String ipMachine = iAddress.getHostAddress();
-
-            // Setando 
-            setHostName(hostname);
-            setIp(ipMachine);
-
-        } catch (UnknownHostException e) {
-            System.out.println(e);
-        }
-
-    }
     
-    public void updateTabela() {
-
-        // Setando fkMaquinaVirtual da classe DadosColetados
-        DadosColetados dados = new DadosColetados();
-        
-        // Variavel com o código de update
-        String updateStatement = "UPDATE maquinaVirtual SET "
-                               + "hostName= ?, ip=?, disco=?, ram=?, processador=? "
-                               + "WHERE id=?;";
-        
-        // Método que executa a query de update
-        template.update(updateStatement,
-                hostName,
-                ip,
-                disco,
-                ram,
-                processador,
-                id);
-        dados.insercaoDados();
-
-    }
 
     public Integer getId() {
         return id;

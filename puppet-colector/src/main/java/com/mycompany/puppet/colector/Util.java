@@ -1,5 +1,6 @@
 package com.mycompany.puppet.colector;
 
+import java.util.List;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
@@ -16,12 +17,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import oshi.SystemInfo;
+import oshi.software.os.FileSystem;
+import oshi.software.os.OperatingSystem;
 
 public class Util {
-
+    
+    private Boolean isColetaAtiva;
     private final Connection config;
     private final JdbcTemplate template;
     private final String userMaquina;
@@ -29,7 +34,16 @@ public class Util {
     private final String diretorioPuppet;
     private final String filePuppetKey;
 
+    public Boolean getIsColetaAtiva() {
+        return isColetaAtiva;
+    }
+
+    public void setIsColetaAtiva(Boolean isColetaAtiva) {
+        this.isColetaAtiva = isColetaAtiva;
+    }
+
     public Util() {
+        isColetaAtiva   = false;
         config          = new Connection();
         template        = new JdbcTemplate(config.getDataSource());
         userMaquina     = System.getProperty("user.name");       
@@ -198,9 +212,8 @@ public class Util {
     // Buscar no banco a máquina através da chave registrada localmente.
     public List<MaquinaVirtual> searchVmByKey(){
        
-        String key = getVmKey(); 
-        
-        List<MaquinaVirtual>vmList;        
+        String key = getVmKey();         
+        List<MaquinaVirtual> vmList;        
        
         String query = String.format("select * from [dbo].[maquinaVirtual] where keyVm = '%s';", key);
         System.out.println(query);
@@ -281,5 +294,66 @@ public class Util {
         System.out.println(vm);      
     }
     
+    public DadosColetados coletarDados(MaquinaVirtual vm){
+        System.out.println("Chamando util.coletarDados()...");
+        
+        DadosColetados dados = new DadosColetados(vm);
+        SystemInfo       systemInfo       = new SystemInfo();
+        OperatingSystem  operatingSystem  = systemInfo.getOperatingSystem();
+        FileSystem       file             = operatingSystem.getFileSystem();
+        Memoria          memoria          = new Memoria();
+        Processador      processador      = new Processador();
+        
+        try {
+            Date dataAtual = new Date(); // dataHora
+
+            Double memoriaUso = memoria.getEmUso().doubleValue();
+            Double memoriaTotal = memoria.getTotal().doubleValue();
+            Double usoMemoria = (memoriaUso / memoriaTotal) * 100.0;
+            Double usoMemoriaConvertido = Math.round(usoMemoria * 100.0) / 100.0; //usoRam
+            
+            Long discoTotal = file.getFileStores().get(0).getTotalSpace();
+            Long discoDisponivel = file.getFileStores().get(0).getFreeSpace();
+            Double usoDisco = (discoTotal.doubleValue() - discoDisponivel.doubleValue()) * 100.0 / 1000.0 / 1000.0 / 1000.0 / 1000.0; 
+            Double usoDiscoConvertido = Math.round(usoDisco * 100.0) / 100.0; //usoDisco
+
+            Double usoCpu = processador.getUso();
+            Double usoCpuConvertido = Math.round(usoCpu * 100.0) / 100.0; //usoCPU
+            
+            dados.setFkMaquinaVirtual(vm.getId());
+            dados.setUsoDisco(usoDiscoConvertido);
+            dados.setUsoRam(usoMemoriaConvertido);
+            dados.setUsoProcessador(usoCpuConvertido);
+            dados.setDataHora(dataAtual);
+            
+            System.out.println("\nUso de memoria Ram...: " + usoMemoriaConvertido);
+            System.out.println("Uso de Disco.........: " + usoDiscoConvertido);
+            System.out.println("Uso de CPU...........: " + usoCpuConvertido);
+            System.out.println("DataHora da coleta...: " + dataAtual);
+
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        
+        return dados;
+    }
     
+    public void inserirDados(DadosColetados dados){
+        System.out.println("Chamando util.inserirDados()...");
+        String updateStatement = ""
+            + "INSERT INTO dadosColetados"
+            + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
+            + "dataHora) "
+            + "VALUES "
+            + "(?,?,?,?,?)";
+                
+        template.update(updateStatement,
+            dados.getFkMaquinaVirtual(),
+            dados.getUsoDisco(),
+            dados.getUsoRam(),
+            dados.getUsoProcessador(),
+            dados.getDataHora());
+        
+        System.out.println("Coleta inserida no banco de dados.");
+    }
 }

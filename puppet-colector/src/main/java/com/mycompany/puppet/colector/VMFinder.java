@@ -6,15 +6,10 @@ package com.mycompany.puppet.colector;
 
 import java.util.List;
 
-/**
- *
- * @author gusta
- */
 public class VMFinder extends javax.swing.JFrame {
     private Usuario usuarioLogado;
-    /**
-     * Creates new form VMFinder
-     */
+    private MaquinaVirtual vm;
+    
     public VMFinder(Usuario usuario) {
         usuarioLogado = usuario;
         initComponents();
@@ -118,7 +113,8 @@ public class VMFinder extends javax.swing.JFrame {
         if(vmList.isEmpty() == false){
             if(util.isVmComplete(vmList.get(0))){
                 lblStatus.setText("Máquina Localizada!");
-                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado);
+                this.vm = vmList.get(0);
+                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado, this.vm);
                 this.dispose();
                 telaUser.setVisible(true);
             }
@@ -127,7 +123,8 @@ public class VMFinder extends javax.swing.JFrame {
                 util.updateVmRegistrationOnAzure(vmList.get(0));
                 System.out.println("Atualizando o resgitro no sistema Puppet");
                 System.out.println(vmList.get(0));
-                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado);
+                this.vm = vmList.get(0);
+                TelaDoUsuario telaUser = new TelaDoUsuario(this.usuarioLogado, this.vm);
                 this.dispose();
                 telaUser.setVisible(true);
             }
