@@ -1,4 +1,4 @@
-# PUPPET Colector 
+# PUPPET Collector 
 ![Badge em Desenvolvimento](http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=GREEN&style=for-the-badge) <br>
 Coletor de dados de máquina virtual oficial da PUPPET Server Monitoring.
 
