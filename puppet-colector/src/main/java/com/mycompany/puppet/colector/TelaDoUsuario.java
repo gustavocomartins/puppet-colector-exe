@@ -7,14 +7,17 @@ package com.mycompany.puppet.colector;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class TelaDoUsuario extends javax.swing.JFrame {
+
+    private Boolean isAtivo = false;
     private Usuario usuarioLogado;
     private MaquinaVirtual vm;
-    private Util util = new Util();   
-    Connection config = new Connection();        
-    JdbcTemplate template = new JdbcTemplate(config.getDataSource()); 
-    
+    private Util util = new Util();
+    Connection config = new Connection();
+    JdbcTemplate template = new JdbcTemplate(config.getDataSource());
+
     /**
      * Creates new form TelaDoUsuario
+     *
      * @param usuario
      * @param vm
      */
@@ -22,12 +25,11 @@ public class TelaDoUsuario extends javax.swing.JFrame {
         this.usuarioLogado = usuario;
         this.vm = vm;
         initComponents();
-        
+
     }
 
     public TelaDoUsuario() {
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -164,23 +166,38 @@ public class TelaDoUsuario extends javax.swing.JFrame {
     private void btnPararColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPararColetaActionPerformed
         // TODO add your handling code here:   
         util.setIsColetaAtiva(false);
-        
+
     }//GEN-LAST:event_btnPararColetaActionPerformed
 
     private void btnIniciarColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarColetaActionPerformed
-                          
-        lblStatusAtualizacao.setText("Configurações de máquina atualizadas");
-        lblStatusColeta.setText("Ativada.");
-        util.setIsColetaAtiva(true);  
-        while(util.getIsColetaAtiva()){
+        MaquinaVirtual mv = new MaquinaVirtual();
+        
+        isAtivo = !isAtivo;
+        if (isAtivo) {
             try {
+
+                lblStatusColeta.setText("Ativada.");
                 DadosColetados dados = util.coletarDados(vm);
                 util.inserirDados(dados);
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 ex.getMessage();
             }
-        }       
+        } else {
+            lblStatusColeta.setText("Desativada.");
+            return;
+        }
+        lblStatusAtualizacao.setText(mv);
+        util.setIsColetaAtiva(true);
+//        while (util.getIsColetaAtiva()) {
+//            try {
+//                DadosColetados dados = util.coletarDados(vm);
+//                util.inserirDados(dados);
+//                Thread.sleep(2000);
+//            } catch (InterruptedException ex) {
+//                ex.getMessage();
+//            }
+//        }
     }//GEN-LAST:event_btnIniciarColetaActionPerformed
 
     /**
