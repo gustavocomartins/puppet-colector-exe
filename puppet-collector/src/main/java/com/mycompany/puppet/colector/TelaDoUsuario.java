@@ -4,16 +4,15 @@
  */
 package com.mycompany.puppet.colector;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TelaDoUsuario extends javax.swing.JFrame {
 
     private Boolean isAtivo = false;
     private Usuario usuarioLogado;
     private MaquinaVirtual vm;
-    private Util util = new Util();
-    Connection config = new Connection();
-    JdbcTemplate template = new JdbcTemplate(config.getDataSource());
+    private  Util util;
 
     /**
      * Creates new form TelaDoUsuario
@@ -22,13 +21,33 @@ public class TelaDoUsuario extends javax.swing.JFrame {
      * @param vm
      */
     public TelaDoUsuario(Usuario usuario, MaquinaVirtual vm) {
+        this.util = new Util();
         this.usuarioLogado = usuario;
         this.vm = vm;
         initComponents();
-
+        insercao();
     }
 
     public TelaDoUsuario() {
+        this.util = new Util();
+    }
+
+    public void insercao() {
+        int delay = 1000;
+        int interval = 5000;
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (isAtivo) {
+                    DadosColetados dados = util.coletarDados(vm);
+                    util.inserirDados(dados);
+                    util.inserirDadosBackup(dados);
+                }
+            }
+        }, delay, interval);
     }
 
     /**
@@ -164,40 +183,25 @@ public class TelaDoUsuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPararColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPararColetaActionPerformed
-        // TODO add your handling code here:   
+        // TODO add your handling code here:  
+        isAtivo = false;
         util.setIsColetaAtiva(false);
 
     }//GEN-LAST:event_btnPararColetaActionPerformed
 
     private void btnIniciarColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarColetaActionPerformed
-        MaquinaVirtual mv = new MaquinaVirtual();
-        
-        isAtivo = !isAtivo;
+        isAtivo = true;
         if (isAtivo) {
-            try {
+            lblStatusColeta.setText("Ativada.");
 
-                lblStatusColeta.setText("Ativada.");
-                DadosColetados dados = util.coletarDados(vm);
-                util.inserirDados(dados);
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                ex.getMessage();
-            }
         } else {
             lblStatusColeta.setText("Desativada.");
-            return;
         }
-        lblStatusAtualizacao.setText(mv);
+
+        lblStatusAtualizacao.setText("Configurações de máquina atualizadas");
         util.setIsColetaAtiva(true);
-//        while (util.getIsColetaAtiva()) {
-//            try {
-//                DadosColetados dados = util.coletarDados(vm);
-//                util.inserirDados(dados);
-//                Thread.sleep(2000);
-//            } catch (InterruptedException ex) {
-//                ex.getMessage();
-//            }
-//        }
+
+
     }//GEN-LAST:event_btnIniciarColetaActionPerformed
 
     /**

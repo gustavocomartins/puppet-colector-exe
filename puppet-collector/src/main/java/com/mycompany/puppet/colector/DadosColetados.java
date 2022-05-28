@@ -6,7 +6,6 @@ package com.mycompany.puppet.colector;
 
 import com.github.britooo.looca.api.group.memoria.Memoria;
 import java.util.Date;
-import org.springframework.jdbc.core.JdbcTemplate;
 import oshi.SystemInfo;
 import oshi.software.os.FileSystem;
 import oshi.software.os.OperatingSystem;
@@ -24,16 +23,12 @@ public class DadosColetados {
     private Double usoProcessador;
     private Date dataHora;
 
-    Connection config = new Connection();
-    JdbcTemplate template = new JdbcTemplate(config.getDataSource());
-
 
     public void coleta(){
 //        API Looca
         Memoria memoria = new Memoria();
 
 //        API OSHI
-        MaquinaVirtual mv = new MaquinaVirtual();
         SystemInfo systemInfo = new SystemInfo();
         OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
         FileSystem file = operatingSystem.getFileSystem();

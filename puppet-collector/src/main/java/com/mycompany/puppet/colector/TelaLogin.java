@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class TelaLogin extends javax.swing.JFrame {
 
-    Connection config = new Connection();
+    Connection config = new Connection("Azure");
     JdbcTemplate template = new JdbcTemplate(config.getDataSource());
     Util util = new Util();
 

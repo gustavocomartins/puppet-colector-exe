@@ -25,7 +25,7 @@ import oshi.software.os.FileSystem;
 import oshi.software.os.OperatingSystem;
 
 public class Util {
-    
+
     private Boolean isColetaAtiva;
     private final Connection config;
     private final JdbcTemplate template;
@@ -43,236 +43,223 @@ public class Util {
     }
 
     public Util() {
-        isColetaAtiva   = false;
-        config          = new Connection();
-        template        = new JdbcTemplate(config.getDataSource());
-        userMaquina     = System.getProperty("user.name");       
-        montagemLinux   = "/home/";
+        isColetaAtiva = false;
+        config = new Connection("Azure");
+        template = new JdbcTemplate(config.getDataSource());
+        userMaquina = System.getProperty("user.name");
+        montagemLinux = "/home/";
         diretorioPuppet = "PuppetCollector";
-        filePuppetKey   = "puppetKey.txt"; 
+        filePuppetKey = "puppetKey.txt";
     }
     // ---------------------------------------------------------------------------------------
     // --Método para login de usuário---------------------------------------------------------
     // ---------------------------------------------------------------------------------------
-    
+
     public List<Usuario> retornarUsuario(String username, String senha) {
-        String queryUser = String.format("select id, username, senha from [dbo].[usuario] where username = '%s';", username);
+        String queryUser = String.format("select id, username, senha from usuario where username = '%s' and senha = '%s';", username);
         System.out.println(queryUser);
         List<Usuario> user = template.query(queryUser, new BeanPropertyRowMapper<>(Usuario.class));
 
         return user;
     }
-    
+
     // ---------------------------------------------------------------------------------------
     // --Métodos para configuração local da VM (Diretórios e arquivo da chave)----------------
     // ---------------------------------------------------------------------------------------
-    
     // Verifica se a VM está localmente configurada.
-    public Boolean isVmConfigured(){
-        Boolean dirCollector  = isCollectorDirExists();
-        Boolean dirLog        = isLogDirExists();
-        Boolean fileKey       = isKeyFileExists();
-        
+    public Boolean isVmConfigured() {
+        Boolean dirCollector = isCollectorDirExists();
+        Boolean dirLog = isLogDirExists();
+        Boolean fileKey = isKeyFileExists();
+
         return dirCollector && dirLog && fileKey;
     }
-    
+
     // Realiza a configuração local necessária.
-    public void setUpVm(){
+    public void setUpVm() {
         createCollectorDir();
         createLogDir();
         createKeyFile();
     }
-    
+
     // ---------------------------------------------------------------------------------------
     // --Métodos para o diretório PuppetCollector---------------------------------------------
     // ---------------------------------------------------------------------------------------
-    
     // Verifica se o diretório Collector existe.
     public Boolean isCollectorDirExists() {
-        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet);              
+        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet);
         return puppetDir.exists();
     }
 
     // Cria o diretório Collector
-    public void createCollectorDir(){
+    public void createCollectorDir() {
         Path path = Paths.get(montagemLinux + userMaquina + "/" + diretorioPuppet);
         try {
-            Files.createDirectory(path);               
-        }       
-        catch (IOException e) {
+            Files.createDirectory(path);
+        } catch (IOException e) {
             System.out.println(String.format("Erro ao criar diretório - %s", path));
-        }           
+        }
     }
-    
+
     // ---------------------------------------------------------------------------------------
     // --Métodos para o diretório de logs-----------------------------------------------------
     // ---------------------------------------------------------------------------------------
-    
-    public Boolean isLogDirExists(){
-        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + "collectorLogs");              
+    public Boolean isLogDirExists() {
+        File puppetDir = new File(montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + "collectorLogs");
         return puppetDir.exists();
     }
-    
-    public void createLogDir(){
+
+    public void createLogDir() {
         Path path = Paths.get(montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + "collectorLogs");
         try {
-            Files.createDirectory(path);               
-        }       
-        catch (IOException e) {
+            Files.createDirectory(path);
+        } catch (IOException e) {
             System.out.println(String.format("Erro ao criar diretório - %s", path));
-        }  
+        }
     }
-    
+
     // ---------------------------------------------------------------------------------------
     // --Métodos para o arquivo puppetKey.txt-------------------------------------------------
     // ---------------------------------------------------------------------------------------
-    
     // Verificar se o arquivo existe.
-    public Boolean isKeyFileExists(){
-        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
-        File puppetKey = new File(pathPuppetKey); 
+    public Boolean isKeyFileExists() {
+        String pathPuppetKey = montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + filePuppetKey;
+        File puppetKey = new File(pathPuppetKey);
         return puppetKey.exists();
     }
-    
-    public void createKeyFile(){
-        String pathKeyFile = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
-        Path path = Paths.get(pathKeyFile);  
-        
+
+    public void createKeyFile() {
+        String pathKeyFile = montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + filePuppetKey;
+        Path path = Paths.get(pathKeyFile);
+
         try {
-            Files.createFile(path);  
-        }       
-        catch (IOException e) {
+            Files.createFile(path);
+        } catch (IOException e) {
             System.out.println("Erro ao criar arquivo " + path.toString());
         }
     }
-    
+
     // Verificar de o arquivo possui chave registrada localmente.
-    public Boolean isKeyLocalRegistered(){
-        String pathKeyFile = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
+    public Boolean isKeyLocalRegistered() {
+        String pathKeyFile = montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + filePuppetKey;
         Boolean isRegistered = false;
-        
-        try(BufferedReader bfrReader = new BufferedReader(new FileReader(pathKeyFile))){
+
+        try ( BufferedReader bfrReader = new BufferedReader(new FileReader(pathKeyFile))) {
             String keyVM = bfrReader.readLine();
-            if(keyVM != null){
+            if (keyVM != null) {
                 System.out.println("keyVM: " + keyVM);
                 isRegistered = true;
-            }
-            else{
+            } else {
                 System.out.println("Sua chave não foi informada ou não está registrada na primeira linha do arquivo puppetLey.txt.");
             }
-        }
-        catch(IOException e){
-            System.out.println("Error: " + e.getMessage());
-        }
-        
-        return isRegistered;
-    }
-    
-    // Registrar chave no arquivo puppetKey.txt.
-    public void registerKeyVMLocal(String keyVM){
-        String pathPuppetKey = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
-        File puppetKey = new File(pathPuppetKey); 
-        
-        try(PrintWriter writer = new PrintWriter(new FileOutputStream(puppetKey))) {
-            writer.println(keyVM.toUpperCase());
-            System.out.println("Novo registro local de chave identificadora realizado com sucesso.");
-            writer.close(); 
-        } 
-        catch(FileNotFoundException e){ 
+        } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
 
-    }   
-        
-    // Buscar a chave no arquivo puppetKey.txt.
-    public String getVmKey(){
-        String pathKeyFile = montagemLinux + userMaquina + "/" +  diretorioPuppet + "/" + filePuppetKey;
-        List<String> keyVmList = new ArrayList<>();
-        String key = "Não encontrada localmente";
-        
-        try(BufferedReader bfrReader = new BufferedReader(new FileReader(pathKeyFile))){
-            String keyRead = bfrReader.readLine();
-            if(keyRead != null){
-                keyVmList.add(keyRead);
-                System.out.println("keyVM: " + keyVmList.get(0));              
-                key = keyVmList.get(0);
-            }
-        }
-        catch(IOException e){
+        return isRegistered;
+    }
+
+    // Registrar chave no arquivo puppetKey.txt.
+    public void registerKeyVMLocal(String keyVM) {
+        String pathPuppetKey = montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + filePuppetKey;
+        File puppetKey = new File(pathPuppetKey);
+
+        try ( PrintWriter writer = new PrintWriter(new FileOutputStream(puppetKey))) {
+            writer.println(keyVM.toUpperCase());
+            System.out.println("Novo registro local de chave identificadora realizado com sucesso.");
+            writer.close();
+        } catch (FileNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        
+
+    }
+
+    // Buscar a chave no arquivo puppetKey.txt.
+    public String getVmKey() {
+        String pathKeyFile = montagemLinux + userMaquina + "/" + diretorioPuppet + "/" + filePuppetKey;
+        List<String> keyVmList = new ArrayList<>();
+        String key = "Não encontrada localmente";
+
+        try ( BufferedReader bfrReader = new BufferedReader(new FileReader(pathKeyFile))) {
+            String keyRead = bfrReader.readLine();
+            if (keyRead != null) {
+                keyVmList.add(keyRead);
+                System.out.println("keyVM: " + keyVmList.get(0));
+                key = keyVmList.get(0);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
         return key;
     }
-    
+
     // ---------------------------------------------------------------------------------------
     // --Métodos da Máquina Virtual-----------------------------------------------------------
     // ---------------------------------------------------------------------------------------
-   
     // Buscar no banco a máquina através da chave registrada localmente.
-    public List<MaquinaVirtual> searchVmByKey(){
-       
-        String key = getVmKey();         
-        List<MaquinaVirtual> vmList;        
-       
+    public List<MaquinaVirtual> searchVmByKey() {
+
+        String key = getVmKey();
+        List<MaquinaVirtual> vmList;
+
         String query = String.format("select * from [dbo].[maquinaVirtual] where keyVm = '%s';", key);
         System.out.println(query);
         vmList = template.query(query, new BeanPropertyRowMapper<>(MaquinaVirtual.class));
-        
-        
+
         return vmList;
     }
-    
+
     // Verificar se uma vm está com o registro completo.
-    public Boolean isVmComplete(MaquinaVirtual vm){
-        Integer ram         = vm.getRam();
-        Integer disco       = vm.getDisco();
-        String  processador = vm.getProcessador();
-        String  ip          = vm.getIp();
-        String  hostname    = vm.getHostName();
-        
+    public Boolean isVmComplete(MaquinaVirtual vm) {
+        Integer ram = vm.getRam();
+        Integer disco = vm.getDisco();
+        String processador = vm.getProcessador();
+        String ip = vm.getIp();
+        String hostname = vm.getHostName();
+
         return ram != null && disco != null && processador != null && ip != null && hostname != null;
-    }    
-    
+    }
+
     // Atualiza o registro da vm no banco de dados Azure da Puppet.
-    public void updateVmRegistrationOnAzure(MaquinaVirtual vm){
+    public void updateVmRegistrationOnAzure(MaquinaVirtual vm) {
         updateObjectVm(vm);
-        
-        String query = "UPDATE maquinaVirtual SET " +
-                       "hostName= ?, ip=?, disco=?, ram=?, processador= ? " +
-                       "WHERE keyVm = ?";
-        
+
+        String query = "UPDATE maquinaVirtual SET "
+                + "hostName= ?, ip=?, disco=?, ram=?, processador= ? "
+                + "WHERE keyVm = ?";
+
         template.update(query,
                 vm.getHostName(),
                 vm.getIp(),
                 vm.getDisco(),
                 vm.getRam(),
                 vm.getProcessador(),
-                vm.getKeyVM());          
+                vm.getKeyVM());
     }
-    
+
     // Atualiza o objeto VM instanciado ao buscar na Azure através da chave.
-    public void updateObjectVm( MaquinaVirtual vm){  
-        Processador processadorVm   = new Processador();
+    public void updateObjectVm(MaquinaVirtual vm) {
+        Processador processadorVm = new Processador();
         DiscosGroup grupoDeDiscosVm = new DiscosGroup();
-        Memoria     memoriaVm       = new Memoria();  
-        
+        Memoria memoriaVm = new Memoria();
+
         Integer ramTotal = (int) (memoriaVm.getTotal() / 1024);
         Integer discoTotal = (int) (grupoDeDiscosVm.getTamanhoTotal() / 1024);
         String processadorNome = String.format("%s %s %d",
                 processadorVm.getFabricante(),
                 processadorVm.getNome(),
                 processadorVm.getNumeroCpusLogicas()
-        );      
+        );
         vm.setRam(ramTotal);
         vm.setDisco(discoTotal);
         vm.setProcessador(processadorNome);
-        
-        String key = getVmKey();       
-        if(key != null){
+
+        String key = getVmKey();
+        if (key != null) {
             vm.setKeyVm(key);
         }
-        
+
         try {
             // Importando o InetAddress
             InetAddress iAddress;
@@ -289,21 +276,21 @@ public class Util {
         } catch (UnknownHostException e) {
             System.out.println(e);
         }
-        
+
         System.out.println("Objeto de classe MáquinaVirtual foi atualizado:");
-        System.out.println(vm);      
+        System.out.println(vm);
     }
-    
-    public DadosColetados coletarDados(MaquinaVirtual vm){
+
+    public DadosColetados coletarDados(MaquinaVirtual vm) {
         System.out.println("Chamando util.coletarDados()...");
-        
+
         DadosColetados dados = new DadosColetados(vm);
-        SystemInfo       systemInfo       = new SystemInfo();
-        OperatingSystem  operatingSystem  = systemInfo.getOperatingSystem();
-        FileSystem       file             = operatingSystem.getFileSystem();
-        Memoria          memoria          = new Memoria();
-        Processador      processador      = new Processador();
-        
+        SystemInfo systemInfo = new SystemInfo();
+        OperatingSystem operatingSystem = systemInfo.getOperatingSystem();
+        FileSystem file = operatingSystem.getFileSystem();
+        Memoria memoria = new Memoria();
+        Processador processador = new Processador();
+
         try {
             Date dataAtual = new Date(); // dataHora
 
@@ -311,49 +298,68 @@ public class Util {
             Double memoriaTotal = memoria.getTotal().doubleValue();
             Double usoMemoria = (memoriaUso / memoriaTotal) * 100.0;
             Double usoMemoriaConvertido = Math.round(usoMemoria * 100.0) / 100.0; //usoRam
-            
+
             Long discoTotal = file.getFileStores().get(0).getTotalSpace();
             Long discoDisponivel = file.getFileStores().get(0).getFreeSpace();
-            Double usoDisco = (discoTotal.doubleValue() - discoDisponivel.doubleValue()) * 100.0 / 1000.0 / 1000.0 / 1000.0 / 1000.0; 
+            Double usoDisco = (discoTotal.doubleValue() - discoDisponivel.doubleValue()) * 100.0 / 1000.0 / 1000.0 / 1000.0 / 1000.0;
             Double usoDiscoConvertido = Math.round(usoDisco * 100.0) / 100.0; //usoDisco
 
             Double usoCpu = processador.getUso();
             Double usoCpuConvertido = Math.round(usoCpu * 100.0) / 100.0; //usoCPU
-            
+
             dados.setFkMaquinaVirtual(vm.getId());
             dados.setUsoDisco(usoDiscoConvertido);
             dados.setUsoRam(usoMemoriaConvertido);
             dados.setUsoProcessador(usoCpuConvertido);
             dados.setDataHora(dataAtual);
-            
+
             System.out.println("\nUso de memoria Ram...: " + usoMemoriaConvertido);
             System.out.println("Uso de Disco.........: " + usoDiscoConvertido);
             System.out.println("Uso de CPU...........: " + usoCpuConvertido);
             System.out.println("DataHora da coleta...: " + dataAtual);
 
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
         return dados;
     }
-    
-    public void inserirDados(DadosColetados dados){
+
+    public void inserirDados(DadosColetados dados) {
         System.out.println("Chamando util.inserirDados()...");
         String updateStatement = ""
-            + "INSERT INTO dadosColetados"
-            + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
-            + "dataHora) "
-            + "VALUES "
-            + "(?,?,?,?,?)";
-                
+                + "INSERT INTO dadosColetados"
+                + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
+                + "dataHora) "
+                + "VALUES "
+                + "(?,?,?,?,?)";
+
         template.update(updateStatement,
-            dados.getFkMaquinaVirtual(),
-            dados.getUsoDisco(),
-            dados.getUsoRam(),
-            dados.getUsoProcessador(),
-            dados.getDataHora());
-        
+                dados.getFkMaquinaVirtual(),
+                dados.getUsoDisco(),
+                dados.getUsoRam(),
+                dados.getUsoProcessador(),
+                dados.getDataHora());
+
         System.out.println("Coleta inserida no banco de dados.");
+
+    }
+
+    public void inserirDadosBackup(DadosColetados dados) {
+        Connection configMysql = new Connection("Mysql");
+        JdbcTemplate template = new JdbcTemplate(configMysql.getDataSource());
+        String updateStatement = ""
+                + "INSERT INTO dadosColetados"
+                + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
+                + "dataHora) "
+                + "VALUES "
+                + "(?,?,?,?,?)";
+
+        template.update(updateStatement,
+                dados.getFkMaquinaVirtual(),
+                dados.getUsoDisco(),
+                dados.getUsoRam(),
+                dados.getUsoProcessador(),
+                dados.getDataHora());
     }
 }
