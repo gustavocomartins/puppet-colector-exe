@@ -33,9 +33,10 @@ public class Util {
     private final String montagemLinux;
     private final String diretorioPuppet;
     private final String filePuppetKey;
+    private final Log log;
 
     public Boolean getIsColetaAtiva() {
-        return isColetaAtiva;
+        return isColetaAtiva;      
     }
 
     public void setIsColetaAtiva(Boolean isColetaAtiva) {
@@ -50,13 +51,14 @@ public class Util {
         montagemLinux = "/home/";
         diretorioPuppet = "PuppetCollector";
         filePuppetKey = "puppetKey.txt";
+        log = new Log(System.getProperty("user.name"));
     }
     // ---------------------------------------------------------------------------------------
     // --Método para login de usuário---------------------------------------------------------
     // ---------------------------------------------------------------------------------------
 
     public List<Usuario> retornarUsuario(String username, String senha) {
-        String queryUser = String.format("select id, username, senha from usuario where username = '%s' and senha = '%s';", username);
+        String queryUser = String.format("select id, username, senha from usuario where username = '%s' and senha = '%s';", username, senha);
         System.out.println(queryUser);
         List<Usuario> user = template.query(queryUser, new BeanPropertyRowMapper<>(Usuario.class));
 
@@ -80,6 +82,7 @@ public class Util {
         createCollectorDir();
         createLogDir();
         createKeyFile();
+        log.newLog("Maquina configurada.");
     }
 
     // ---------------------------------------------------------------------------------------
@@ -96,7 +99,9 @@ public class Util {
         Path path = Paths.get(montagemLinux + userMaquina + "/" + diretorioPuppet);
         try {
             Files.createDirectory(path);
+            log.newLog("Diretorio PuppetCollector criado com sucesso.");
         } catch (IOException e) {
+            log.newLog("Erro ao tentar criar o diretorio PuppetCollector");
             System.out.println(String.format("Erro ao criar diretório - %s", path));
         }
     }
@@ -134,7 +139,9 @@ public class Util {
 
         try {
             Files.createFile(path);
+            log.newLog("Arquivo ketVM.txt criado com sucesso.");
         } catch (IOException e) {
+            log.newLog("Erro ao criar arquivo kryVM.txt");
             System.out.println("Erro ao criar arquivo " + path.toString());
         }
     }
@@ -168,8 +175,10 @@ public class Util {
             writer.println(keyVM.toUpperCase());
             System.out.println("Novo registro local de chave identificadora realizado com sucesso.");
             writer.close();
+            log.newLog("Nova chave de identificacao de maquina cadastrada localmente.");
         } catch (FileNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
+            log.newLog("Erro ao gravar chave de identificacao");
         }
 
     }
@@ -206,7 +215,7 @@ public class Util {
         String query = String.format("select * from [dbo].[maquinaVirtual] where keyVm = '%s';", key);
         System.out.println(query);
         vmList = template.query(query, new BeanPropertyRowMapper<>(MaquinaVirtual.class));
-
+        
         return vmList;
     }
 
@@ -236,6 +245,8 @@ public class Util {
                 vm.getRam(),
                 vm.getProcessador(),
                 vm.getKeyVM());
+        
+        log.newLog("Cadastro de maquina na base Puppet Azure atualizado com sucesso.");
     }
 
     // Atualiza o objeto VM instanciado ao buscar na Azure através da chave.
@@ -317,8 +328,11 @@ public class Util {
             System.out.println("Uso de Disco.........: " + usoDiscoConvertido);
             System.out.println("Uso de CPU...........: " + usoCpuConvertido);
             System.out.println("DataHora da coleta...: " + dataAtual);
+            
+            log.newLog("Coleta de dados realizada com sucesso.");
 
         } catch (Exception e) {
+            log.newLog("Erro ao tentar coletar de dados de maquina.");
             System.out.println(e);
         }
 
@@ -341,13 +355,13 @@ public class Util {
                 dados.getUsoProcessador(),
                 dados.getDataHora());
 
-        System.out.println("Coleta inserida no banco de dados.");
+        log.newLog("Registro de coleta cadastrado na base oficial Puppet na Azure.");
 
     }
 
     public void inserirDadosBackup(DadosColetados dados) {
         Connection configMysql = new Connection("Mysql");
-        JdbcTemplate template = new JdbcTemplate(configMysql.getDataSource());
+        JdbcTemplate template1 = new JdbcTemplate(configMysql.getDataSource());
         String updateStatement = ""
                 + "INSERT INTO dadosColetados"
                 + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
@@ -361,5 +375,7 @@ public class Util {
                 dados.getUsoRam(),
                 dados.getUsoProcessador(),
                 dados.getDataHora());
+        
+        log.newLog("Registro de coleta cadastrado na base de backup local MySQL.");
     }
 }
