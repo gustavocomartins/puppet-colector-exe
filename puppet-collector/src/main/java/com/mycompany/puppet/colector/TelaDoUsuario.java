@@ -185,6 +185,7 @@ public class TelaDoUsuario extends javax.swing.JFrame {
     private void btnPararColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPararColetaActionPerformed
         // TODO add your handling code here:  
         isAtivo = false;
+        util.setStatusOffAzure(vm);
         util.setIsColetaAtiva(false);
 
     }//GEN-LAST:event_btnPararColetaActionPerformed
@@ -193,9 +194,13 @@ public class TelaDoUsuario extends javax.swing.JFrame {
         isAtivo = true;
         if (isAtivo) {
             lblStatusColeta.setText("Ativada.");
+            vm.setVmStatus("on");
+            util.setStatusOnAzure(vm);
 
         } else {
             lblStatusColeta.setText("Desativada.");
+            vm.setVmStatus("off");
+            util.setStatusOffAzure(vm);
         }
 
         lblStatusAtualizacao.setText("Configurações de máquina atualizadas");

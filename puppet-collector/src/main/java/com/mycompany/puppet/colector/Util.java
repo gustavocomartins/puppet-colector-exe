@@ -235,7 +235,7 @@ public class Util {
         updateObjectVm(vm);
 
         String query = "UPDATE maquinaVirtual SET "
-                + "hostName= ?, ip=?, disco=?, ram=?, processador= ? "
+                + "hostName= ?, ip=?, disco=?, ram=?, processador= ?, vmStatus= 'off' "
                 + "WHERE keyVm = ?";
 
         template.update(query,
@@ -343,7 +343,7 @@ public class Util {
         System.out.println("Chamando util.inserirDados()...");
         String updateStatement = ""
                 + "INSERT INTO dadosColetados"
-                + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
+                + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador, "
                 + "dataHora) "
                 + "VALUES "
                 + "(?,?,?,?,?)";
@@ -361,7 +361,6 @@ public class Util {
 
     public void inserirDadosBackup(DadosColetados dados) {
         Connection configMysql = new Connection("Mysql");
-        JdbcTemplate template1 = new JdbcTemplate(configMysql.getDataSource());
         String updateStatement = ""
                 + "INSERT INTO dadosColetados"
                 + "(fkMaquinaVirtual, usoDisco, usoRam, usoProcessador,"
@@ -377,5 +376,15 @@ public class Util {
                 dados.getDataHora());
         
         log.newLog("Registro de coleta cadastrado na base de backup local MySQL.");
+    }
+    
+    public void setStatusOnAzure(MaquinaVirtual vm) {
+        String query = "update maquinaVirtual set vmStatus = 'on' where id = ?";
+        template.update(query, vm.getId());
+    }
+    
+    public void setStatusOffAzure(MaquinaVirtual vm) {
+        String query = "update maquinaVirtual set vmStatus = 'off' where id = ?";
+        template.update(query, vm.getId());
     }
 }

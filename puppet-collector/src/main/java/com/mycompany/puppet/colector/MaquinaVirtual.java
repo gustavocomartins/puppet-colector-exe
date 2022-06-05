@@ -18,6 +18,7 @@ public class MaquinaVirtual {
     private Integer ram;
     private String  processador;
     private String  keyVM;
+    private String vmStatus;
 
     public MaquinaVirtual() {
         
@@ -34,7 +35,8 @@ public class MaquinaVirtual {
                 + "Armazenamento: %d\n"
                 + "Memória ram: %d\n"
                 + "Processador: %s\n"
-                + "keyVM: %s\n",
+                + "keyVM: %s\n"
+                + "vmStatus: %s\n",
                 id, fkAdmin,
                 hostName,
                 nome,
@@ -42,7 +44,8 @@ public class MaquinaVirtual {
                 disco,
                 ram,
                 processador, 
-                keyVM);
+                keyVM,
+                vmStatus);
     }
     
 
@@ -116,5 +119,12 @@ public class MaquinaVirtual {
 
     public void setKeyVm(String keyVM) {
         this.keyVM = keyVM;
+    }
+    public String getVmStatus() {
+        return vmStatus;
+    }
+
+    public void setVmStatus(String vmStatus) {
+        this.vmStatus = vmStatus;
     }
 }
