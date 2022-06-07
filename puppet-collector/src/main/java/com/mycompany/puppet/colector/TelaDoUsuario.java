@@ -4,15 +4,18 @@
  */
 package com.mycompany.puppet.colector;
 
+import com.github.britooo.looca.api.group.memoria.Memoria;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+import org.json.JSONObject;
 
 public class TelaDoUsuario extends javax.swing.JFrame {
 
     private Boolean isAtivo = false;
     private Usuario usuarioLogado;
     private MaquinaVirtual vm;
-    private  Util util;
+    private Util util;
 
     /**
      * Creates new form TelaDoUsuario
@@ -212,7 +215,27 @@ public class TelaDoUsuario extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException, InterruptedException {
+        Util util = new Util();
+        do {
+            try {
+                Memoria memoria = new Memoria();
+                JSONObject json = new JSONObject();
+
+                Long memoriaTotal = memoria.getTotal();
+                Long memoriaUso = memoria.getEmUso();
+                Long porcentagemMemoria = (memoriaUso * 100) / memoriaTotal;
+                String notificacaoSlack = String.format("Porcentagem da memória sendo utilizada %d%%", porcentagemMemoria);
+
+                json.put("text", notificacaoSlack);
+                Slack.sendMessage(json);
+            } catch (Exception e) {
+                System.out.println("Erro");
+            }
+
+        } while (util.getIsColetaAtiva() == true);
+
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
