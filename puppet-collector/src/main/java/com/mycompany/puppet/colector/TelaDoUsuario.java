@@ -4,11 +4,9 @@
  */
 package com.mycompany.puppet.colector;
 
-import com.github.britooo.looca.api.group.memoria.Memoria;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-import org.json.JSONObject;
 
 public class TelaDoUsuario extends javax.swing.JFrame {
 
@@ -189,30 +187,13 @@ public class TelaDoUsuario extends javax.swing.JFrame {
         // TODO add your handling code here:  
         isAtivo = false;
         util.setStatusOffAzure(vm);
+        lblStatusColeta.setText("Desativada.");
         util.setIsColetaAtiva(false);
 
     }//GEN-LAST:event_btnPararColetaActionPerformed
 
     private void btnIniciarColetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarColetaActionPerformed
         isAtivo = true;
-        Util util = new Util();
-        do {
-            try {
-                Memoria memoria = new Memoria();
-                JSONObject json = new JSONObject();
-
-                Long memoriaTotal = memoria.getTotal();
-                Long memoriaUso = memoria.getEmUso();
-                Long porcentagemMemoria = (memoriaUso * 100) / memoriaTotal;
-                String notificacaoSlack = String.format("Porcentagem da memória sendo utilizada %d%%", porcentagemMemoria);
-
-                json.put("text", notificacaoSlack);
-                Slack.sendMessage(json);
-            } catch (Exception e) {
-                System.out.println("Erro");
-            }
-
-        } while (isAtivo);
         
         if (isAtivo) {
             lblStatusColeta.setText("Ativada.");
@@ -227,7 +208,6 @@ public class TelaDoUsuario extends javax.swing.JFrame {
 
         lblStatusAtualizacao.setText("Configurações de máquina atualizadas");
         util.setIsColetaAtiva(true);
-
 
     }//GEN-LAST:event_btnIniciarColetaActionPerformed
 

@@ -23,7 +23,7 @@ public class DadosColetados {
     private Double usoProcessador;
     private Date dataHora;
 
-
+    
     public void coleta(){
 //        API Looca
         Memoria memoria = new Memoria();
@@ -36,9 +36,9 @@ public class DadosColetados {
 //        Calculo de disco
         Long total = file.getFileStores().get(0).getTotalSpace();
         Long disponivel = file.getFileStores().get(0).getFreeSpace();
-        Double usoDisco = (total.doubleValue() - disponivel.doubleValue()) * 100.0 / 1000.0 / 1000.0 / 1000.0 / 1000.0;
+        Double porcentagemDisco = (total.doubleValue() - disponivel.doubleValue());
 
-        Double usoDiscoConvertido = Math.round(usoDisco * 100.000) / 100.00;
+        Double usoDiscoConvertido = Math.round(porcentagemDisco * 100.0) / 100.0;
         System.out.println(usoDiscoConvertido);
 
         Double memoriaUso = memoria.getEmUso().doubleValue();
@@ -48,7 +48,8 @@ public class DadosColetados {
 
         System.out.println("disco disponivel: " + disponivel);
         System.out.println("disco Total: " + total);
-        System.out.println("Porcentagem: " + usoDisco);
+        System.out.println("Porcentagem: " + porcentagemDisco);      
+        
     }
 
     public DadosColetados(MaquinaVirtual vm) {

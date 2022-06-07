@@ -84,10 +84,18 @@
             <version>20220320</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.github.seratch/jslack -->
         <dependency>
-            <groupId>com.slack.api</groupId>
-            <artifactId>slack-api-client</artifactId>
-            <version>1.22.1</version>
+            <groupId>com.github.seratch</groupId>
+            <artifactId>jslack</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.13</version>
         </dependency>
     </dependencies>
     <name>puppet-collector</name>

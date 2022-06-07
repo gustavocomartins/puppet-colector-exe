@@ -329,6 +329,51 @@ public class Util {
             System.out.println("Uso de CPU...........: " + usoCpuConvertido);
             System.out.println("DataHora da coleta...: " + dataAtual);
             
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------
+            
+            if(usoDiscoConvertido >= 55.0 && usoDiscoConvertido <= 65.0){
+                String msg = String.format(":large_yellow_circle: - O disco rigido do seu servidor registrou alerta amarelo (ATENCAO) >>> indice de uso: (%.2f%%)", usoDiscoConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if(usoDiscoConvertido > 65.0 && usoDiscoConvertido <= 75.0){
+                String msg = String.format(":large_orange_circle: - O disco rigido do seu servidor registrou alerta laranja (PREOCUPANTE) >>> indice de uso: (%.2f%%)", usoDiscoConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if (usoDiscoConvertido > 75.0){
+                String msg = String.format(":red_circle: - O disco rigido do seu servidor registrou alerta vermelho (CRITICO) >>> indice de uso: (%.2f%%)", usoDiscoConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------
+            
+            if(usoMemoriaConvertido >= 55.0 && usoMemoriaConvertido <= 65.0){
+                String msg = String.format(":large_yellow_circle: - A memoria RAM do seu servidor registrou alerta amarelo (ATENCAO) >>> indice de uso: (%.2f%%)", usoMemoriaConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if(usoMemoriaConvertido > 65.0 && usoMemoriaConvertido <= 75.0){
+                String msg = String.format(":large_orange_circle: - A memoria RAM do seu servidor registrou alerta laranja (PREOCUPANTE) >>> indice de uso: (%.2f%%)", usoMemoriaConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if (usoMemoriaConvertido > 75.0){
+                String msg = String.format(":red_circle: - A memoria RAM do seu servidor registrou alerta vermelho (CRITICO) >>> indice de uso: (%.2f%%)", usoMemoriaConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            
+            // ------------------------------------------------------------------------------------------------------------------------------------------------------
+            
+            if(usoCpuConvertido >= 55.0 && usoCpuConvertido <= 65.0){
+                String msg = String.format(":large_yellow_circle: - A memoria RAM do seu servidor registrou alerta amarelo (ATENCAO) >>> indice de uso: (%.2f%%)", usoCpuConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if(usoCpuConvertido > 65.0 && usoCpuConvertido <= 75.0){
+                String msg = String.format(":large_orange_circle: - A memoria RAM do seu servidor registrou alerta laranja (PREOCUPANTE) >>> indice de uso: (%.2f%%)", usoCpuConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+            else if (usoCpuConvertido > 75.0){
+                String msg = String.format(":red_circle: - A memoria RAM do seu servidor registrou alerta vermelho (CRITICO) >>> indice de uso: (%.2f%%)", usoCpuConvertido);
+                CollectorSlack.sendSlackMessage(msg);
+            }
+        
             log.newLog("Coleta de dados realizada com sucesso.");
 
         } catch (Exception e) {
